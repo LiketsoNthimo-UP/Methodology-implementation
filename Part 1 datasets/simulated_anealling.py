@@ -201,6 +201,11 @@ call_centre_scenario['Time_to_abandon'] = call_centre_scenario['Time_to_abandon'
 shifts = shifts[shifts['Staffing_interval'] == staffing_interval]
 del shifts['Staffing_interval']
 
-call_centre_scenario_minimized = call_centre_scenario[call_centre_scenario.Day.isin(range(1,101))]
+call_centre_scenario_minimized = call_centre_scenario[call_centre_scenario.Day.isin(range(1,1001))]
 
 a, b, c = simulated_annealing(shifts, call_centre_scenario_minimized, max_wait, max_iteration = 50)
+
+file_name = 'explored_fitness_value_history.csv'
+pd.DataFrame(c).to_csv(file_name, index=False)
+
+plot(a)
