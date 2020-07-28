@@ -11,7 +11,7 @@ import math
 import random
 from datetime import datetime
 
-def cooling_schedule(t, initial_temperature = 1000, phi = 0.99):
+def cooling_schedule(t, initial_temperature = 1000, phi = 0.9):
     current_temperature = initial_temperature * phi ** t
     return current_temperature
 
@@ -159,23 +159,25 @@ def simulated_annealing(shifts, call_centre_scenario, max_wait,  max_iteration =
         delta_w = random.choices([-1, 0, 1], k = shift_count)
         w_next = w_best
         w_next['Staff_number'] = w_next['Staff_number'] + delta_w
-        is_feasible = check_shift_feasibility(w_next, call_centre_scenario, max_wait)
+        cost_next = calculate_cost(w_next)
         
-        if is_feasible:
-            cost_next = calculate_cost(w_next)
-        
-        else:
+        if any(w_next['Staff_number']<0):
             continue
+        
+        explored_fitness_value_history.append(cost_next)
         
         delta_cost = cost_next - cost_best
         
-        
         if cost_best > cost_next or accept_bad_solution(delta_cost, T):
-            w_best = w_next
-            cost_best = cost_next
-            best_fitness_value_history.append(cost_best)
-        
-        explored_fitness_value_history.append(cost_next)
+            is_feasible = check_shift_feasibility(w_next, call_centre_scenario, max_wait)
+            
+            if is_feasible:
+                w_best = w_next
+                cost_best = cost_next
+                best_fitness_value_history.append(cost_best)
+            
+            else:
+                continue
         
     return w_best, best_fitness_value_history, explored_fitness_value_history
 
@@ -185,7 +187,7 @@ shifts = pd.read_csv('../Part 1 datasets/Shifts.csv')
 
 staffing_interval = 4
 service_rate = '1'
-offered_load = '5'
+offered_load = '15'
 RA = '0.5'
 abandonment_rate = '1'
 max_wait = 0
@@ -201,11 +203,9 @@ call_centre_scenario['Time_to_abandon'] = call_centre_scenario['Time_to_abandon'
 shifts = shifts[shifts['Staffing_interval'] == staffing_interval]
 del shifts['Staffing_interval']
 
-call_centre_scenario_minimized = call_centre_scenario[call_centre_scenario.Day.isin(range(1,1001))]
+call_centre_scenario_minimized = call_centre_scenario[call_centre_scenario.Day.isin(range(1,11))]
 
-a, b, c = simulated_annealing(shifts, call_centre_scenario_minimized, max_wait, max_iteration = 50)
+a, b, c = simulated_annealing(shifts, call_centre_scenario_minimized, max_wait, max_iteration = 100)
 
 file_name = 'explored_fitness_value_history.csv'
-pd.DataFrame(c).to_csv(file_name, index=False)
-
-plot(a)
+#pd.DataFrame(c).to_csv(file_name, index=False)
