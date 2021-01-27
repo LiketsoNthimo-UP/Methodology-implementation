@@ -96,7 +96,7 @@ def check_shift_feasibility(shift_schedule, call_centre_scenario, max_wait):
                 for j in range(agent_rows):
                     # Checks that call can be answered before customer runs out of patience and that call arrives before agent shift has ended
                     # also check that the call arrives before the agent leaves for break or that the agent is back before the customer drops
-                    if (agent_logs.iloc[j,0] < call_features.iloc[0,0] + call_features.iloc[0,2]) and (agent_logs.iloc[j,1] > call_features.iloc[0,0]) and (agent_logs.iloc[j,2] > call_features.iloc[0,0]):
+                    if (agent_logs.iloc[j,0] <= call_features.iloc[0,0] + call_features.iloc[0,2]) and (agent_logs.iloc[j,1] > call_features.iloc[0,0]) and ((agent_logs.iloc[j,2] > call_features.iloc[0,0]) or (agent_logs.iloc[j,3] <= call_features.iloc[0,0] + call_features.iloc[0,2])):
                         call_features = call_features.assign(Waiting_time = np.maximum(agent_logs.iloc[0,0] - call_features.iloc[0,0],0))
                         call_features = call_features.assign(Call_answered = 'yes')
                         call_centre_scenario_operation = call_centre_scenario_operation.append(call_features)
