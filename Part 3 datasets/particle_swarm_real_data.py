@@ -49,6 +49,7 @@ def update_break_periods(agent_logs, arrival_time):
     agent_logs_on_shift = agent_logs.loc[(agent_logs['Break_start'] > arrival_time) | (agent_logs['Break_end'] <= arrival_time),]
     agent_logs_on_break = agent_logs_on_break.assign(Start_time = agent_logs_on_break['Break_end'])
     agent_logs = agent_logs_on_break.append(agent_logs_on_shift)
+    agent_logs = agent_logs.sort_index()
     return agent_logs
 
 
