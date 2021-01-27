@@ -189,7 +189,7 @@ def cycle_number_to_shift_day(shift_schedule, day_range):
 '''
 
 
-sample_size = 31
+sample_size = 6
 day_range = range(1,sample_size)
 
 max_wait_sec = 20
