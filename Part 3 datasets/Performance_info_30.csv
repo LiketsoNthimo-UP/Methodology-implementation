@@ -1,0 +1,3 @@
+Day,Good_periods,Cost,Answered_calls,Dropped_calls,Total_good_periods,Total_cost,Total_answered_calls,Total_dropped_calls
+1.0,59.0,384.0,5220.0,275.0,116.0,679.0,9990.0,607.0
+2.0,57.0,295.0,4770.0,332.0,116.0,679.0,9990.0,607.0

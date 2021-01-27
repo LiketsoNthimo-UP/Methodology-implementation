@@ -37,7 +37,7 @@ def generate_day(service_rate, offered_load, RA, abandonment_rate):
     current_arrival_rate = find_current_arrival_rate(average_arrival_rate, RA, current_time)
     scenario_data = pd.DataFrame()
 
-    for day in range(1,1001):
+    for day in range(1,11):
         call_features = generate_call_features(current_arrival_rate, service_rate, abandonment_rate)
         arrival_time = current_time + call_features[0]
         append_call_features = np.zeros((1,4))
@@ -63,9 +63,9 @@ def generate_day(service_rate, offered_load, RA, abandonment_rate):
 def consolidate(selection):
     variable_combo = pd.read_csv('Variable_combo.csv')
     variable_combo_filtered = variable_combo[variable_combo['Service_rate'] == selection]
-    #variable_combo_filtered = variable_combo_filtered[variable_combo_filtered['Offered_load'] == 15]
-    #variable_combo_filtered = variable_combo_filtered[variable_combo_filtered['Relative_amplitude'] == 1]
-    #variable_combo_filtered = variable_combo_filtered[variable_combo_filtered['Abandonment_rate'] == 4]
+    variable_combo_filtered = variable_combo_filtered[variable_combo_filtered['Offered_load'] == 64]
+    variable_combo_filtered = variable_combo_filtered[variable_combo_filtered['Relative_amplitude'] == 1]
+    variable_combo_filtered = variable_combo_filtered[variable_combo_filtered['Abandonment_rate'] == 2]
     
     rows = variable_combo_filtered.shape[0]
     
@@ -76,6 +76,6 @@ def consolidate(selection):
         scenario_data.columns = ['Arrival_time', 'Service_duration', 'Time_to_abandon', 'Day']
         export_data(scenario_data, scenario_text)
 
-consolidate(1)
+#consolidate(1)
 consolidate(2)
-consolidate(4)
+#consolidate(4)
