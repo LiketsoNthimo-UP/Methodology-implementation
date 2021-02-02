@@ -212,13 +212,11 @@ def simulated_annealing(shifts, call_centre_scenario, max_wait, max_cost, max_ag
             continue
         
         if cost_next > max_cost:
-            print('1Cost next: ' + str(cost_next))
-            print('1Agents: ' + str(agents))
+            print('Cost next: ' + str(cost_next))
+            print('Agents: ' + str(agents))
             continue
         
         if agents > max_agents:
-            print('2Cost next: ' + str(cost_next))
-            print('2Agents: ' + str(agents))
             continue
         
         good_periods_next = good_performance_periods(w_next_per_day, call_centre_scenario, max_wait)
@@ -235,12 +233,12 @@ def simulated_annealing(shifts, call_centre_scenario, max_wait, max_cost, max_ag
 
 
 def run_test_case(average_time_to_abandon, sample_size):
-    shifts = pd.read_csv('../Part 3 datasets/Shifts_with_cycle_number.csv')
+    shifts = pd.read_csv('../Part 3 datasets/Shifts_actual_with_cycle_number.csv')
     
     average_time_to_abandon = str(average_time_to_abandon)
     max_wait_sec = 20
     max_wait = max_wait_sec/60/60
-    max_cost = 414 * (sample_size-1)
+    max_cost = 9329
     max_agents = 77
     
     scenario_name = 'individual_arrivals_' + str(average_time_to_abandon) + '.csv'
@@ -253,7 +251,7 @@ def run_test_case(average_time_to_abandon, sample_size):
     
     day_range = range(1,sample_size)
     call_centre_scenario_minimized = call_centre_scenario[call_centre_scenario.Day.isin(day_range)]
-    best_shift, best_history, explored_history = simulated_annealing(shifts, call_centre_scenario_minimized, max_wait, max_cost, max_agents, day_range, max_iteration = 20)
+    best_shift, best_history, explored_history = simulated_annealing(shifts, call_centre_scenario_minimized, max_wait, max_cost, max_agents, day_range, max_iteration = 250)
     
     df_best_shift = pd.DataFrame(best_shift)
     df_best_history = pd.DataFrame(best_history)
@@ -267,6 +265,6 @@ def run_test_case(average_time_to_abandon, sample_size):
 
 
 average_time_to_abandon = 30
-test_case_results = run_test_case(average_time_to_abandon, 4)
+test_case_results = run_test_case(average_time_to_abandon, 24)
 file_name = 'Results_' + str(average_time_to_abandon) + '.csv'
 test_case_results.to_csv(file_name, index=False)
