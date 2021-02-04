@@ -171,6 +171,9 @@ def particle_swarm_optimisation(shifts, call_centre_scenario, max_wait, max_cost
     best_fitness_value_history = [] # Best fitness function we have seen
     explored_fitness_value_history = [] # All fitness functions we have accepted (whether good or random)
     
+    explored_fitness_value_history.append(swarm_best_good_periods)
+    best_fitness_value_history.append(swarm_best_good_periods)
+    
     for t in range(max_iteration):
         print('time at iteration ',t , ': ', datetime.now() - start)
         
@@ -187,6 +190,7 @@ def particle_swarm_optimisation(shifts, call_centre_scenario, max_wait, max_cost
             current_particle_agents = current_particle_shift['Staff_number'].sum()
             
             if current_particle_cost > max_cost:
+                print('Cost next: ' + str(cost_next))
                 continue
         
             if current_particle_agents > max_agents:
@@ -234,14 +238,14 @@ def run_test_case(average_time_to_abandon, sample_size):
     df_best_history = pd.DataFrame(best_history)
     df_explored_history = pd.DataFrame(explored_history)
     df_explored_history.columns = ['Explored_history']
-    '''df_best_history.columns = ['Best_history']
+    df_best_history.columns = ['Best_history']
     
     consolidation = pd.concat([df_explored_history, df_best_history.reindex(df_explored_history.index)], axis=1)
     consolidation = pd.concat([consolidation, df_best_shift.reindex(consolidation.index)], axis=1)
-    return consolidation'''
+    return consolidation
 
 
 average_time_to_abandon = 30
 test_case_results = run_test_case(average_time_to_abandon, 2)
-#file_name = 'Results_' + str(average_time_to_abandon) + '.csv'
-#test_case_results.to_csv(file_name, index=False)
+file_name = 'Results_' + str(average_time_to_abandon) + '.csv'
+test_case_results.to_csv(file_name, index=False)
