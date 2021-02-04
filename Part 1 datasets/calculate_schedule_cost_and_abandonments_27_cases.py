@@ -53,9 +53,7 @@ def update_agent_times(agent_logs, call_features, agent_index):
     agent_logs = update_break_periods(agent_logs, arrival_time)
     
     agent_logs.iloc[agent_index,0] = arrival_time + call_features.iloc[0,1]
-    if agent_logs.iloc[agent_index,0] > agent_logs.iloc[agent_index,1]:
-        #agent_logs = agent_logs.iloc[1:,]
-        agent_logs = agent_logs.drop(agent_logs.index[agent_index])
+    agent_logs = agent_logs.loc[(agent_logs['Start_time'] < agent_logs['End_time']) & (agent_logs['End_time'] > arrival_time),]
         
     agent_logs = agent_logs.sort_values(by = ['Start_time', 'End_time', 'Break_start', 'Break_end'])
     agent_logs = agent_logs.reset_index(drop = True)
