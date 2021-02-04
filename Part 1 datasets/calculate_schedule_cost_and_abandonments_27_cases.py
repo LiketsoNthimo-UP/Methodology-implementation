@@ -17,18 +17,8 @@ def export_data(dataset, filename):
     dataset.to_csv(file_name, index=False)
 
 def calculate_cost(shift_schedule):
-    rows = shift_schedule.shape[0]
-    total_cost = 0
-    
-    for i in range(rows):
-        shift_start = shift_schedule.iloc[i,0]
-        shift_end = shift_schedule.iloc[i,1]
-        shift_break_start = shift_schedule.iloc[i,2]
-        shift_break_end = shift_schedule.iloc[i,3]
-        shift_staff_number = shift_schedule.iloc[i,4]
-        
-        shift_cost = (shift_end - shift_start - (shift_break_end - shift_break_start)) * shift_staff_number
-        total_cost = total_cost + shift_cost
+    total_cost = (shift_schedule['End_time'] - shift_schedule['Start_time'] - (shift_schedule['Break_end'] - shift_schedule['Break_start'])) * shift_schedule['Staff_number']
+    total_cost = total_cost.sum()
     
     return total_cost/60/60
 
