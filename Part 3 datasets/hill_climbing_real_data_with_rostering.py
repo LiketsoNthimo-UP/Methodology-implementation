@@ -55,11 +55,13 @@ def update_agent_times(agent_logs, call_features, agent_index):
     agent_logs = agent_logs.reset_index(drop = True)
     return agent_logs
 
-def good_performance_periods(shift_schedule_per_day, call_centre_scenario, max_wait):
+def good_performance_periods(shift_schedule_per_day, call_centre_scenario, max_wait, current_good_periods_shortage):
     call_centre_scenario_operation = pd.DataFrame()
     unique_days = call_centre_scenario['Day'].unique()
     service_level = 0.8
     total_met_sl_periods = 0
+    unmet_sl_periods = 0
+    days_observed = 0
     
     for day in unique_days:
         day_shift_schedule = shift_schedule_per_day[shift_schedule_per_day['Day'] == day].copy()
@@ -109,6 +111,14 @@ def good_performance_periods(shift_schedule_per_day, call_centre_scenario, max_w
                 if service_level_calls / all_calls >= service_level:
                     total_met_sl_periods = total_met_sl_periods + 1
         
+        days_observed = days_observed + 1
+        possible_good_periods_so_far = 72 * days_observed
+        good_periods_shortage_so_far = possible_good_periods_so_far - total_met_sl_periods
+        
+        if good_periods_shortage_so_far > current_good_periods_shortage:
+            print('Early interation cut-off on day: ' + str(day))
+            break
+
         #print('day: ' + str(day) + ' with ', str(total_met_sl_periods), ' good periods.')
         
     return total_met_sl_periods
@@ -169,7 +179,8 @@ def hill_climbing(shifts, call_centre_scenario, max_wait, max_cost, max_agents, 
     start = datetime.now()
     w_init = initial_shift_set(shifts, max_agents)
     w_init_per_day = cycle_number_to_shift_day(w_init, day_range)
-    good_periods_init = good_performance_periods(w_init_per_day, call_centre_scenario, max_wait)
+    possible_good_periods = 72 * len(day_range)
+    good_periods_init = good_performance_periods(w_init_per_day, call_centre_scenario, max_wait, possible_good_periods)
     w_best = w_init.copy()
     good_periods_best = good_periods_init
     shift_count = shifts.shape[0]
@@ -178,8 +189,6 @@ def hill_climbing(shifts, call_centre_scenario, max_wait, max_cost, max_agents, 
     explored_fitness_value_history = [] # All fitness functions we have accepted (whether good or random)
     best_fitness_value_history.append(good_periods_best)
     explored_fitness_value_history.append(good_periods_best)
-
-    possible_good_periods = 72 * len(day_range)
     
     for t in range(max_iteration):
         print('time at iteration ',t , ': ', datetime.now() - start)
@@ -212,7 +221,9 @@ def hill_climbing(shifts, call_centre_scenario, max_wait, max_cost, max_agents, 
         if agents > max_agents:
             continue
         
-        good_periods_next = good_performance_periods(w_next_per_day, call_centre_scenario, max_wait)
+        good_periods_shortage = possible_good_periods - good_periods_best
+
+        good_periods_next = good_performance_periods(w_next_per_day, call_centre_scenario, max_wait, good_periods_shortage)
         explored_fitness_value_history.append(good_periods_next)
         
         if good_periods_next > good_periods_best:
