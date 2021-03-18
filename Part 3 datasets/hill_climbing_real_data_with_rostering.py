@@ -12,10 +12,6 @@ import random
 from datetime import datetime
 import multiprocessing
 
-def cooling_schedule(t, initial_temperature = 1000, phi = 0.9):
-    current_temperature = initial_temperature * phi ** t
-    return current_temperature
-
 def calculate_cost(shift_schedule):
     total_cost = (shift_schedule['End_time'] - shift_schedule['Start_time'] - (shift_schedule['Break_end'] - shift_schedule['Break_start'])) * shift_schedule['Staff_number']
     total_cost = total_cost.sum()
@@ -182,11 +178,16 @@ def hill_climbing(shifts, call_centre_scenario, max_wait, max_cost, max_agents, 
     explored_fitness_value_history = [] # All fitness functions we have accepted (whether good or random)
     best_fitness_value_history.append(good_periods_best)
     explored_fitness_value_history.append(good_periods_best)
+
+    possible_good_periods = 72 * len(day_range)
     
     for t in range(max_iteration):
         print('time at iteration ',t , ': ', datetime.now() - start)
         
-        delta_w = random.choices([-1, 0], k = shift_count)
+        if good_periods_best >= possible_good_periods:
+            print('Service level met in all performance periods')
+            break
+
         w_next = w_best.copy()
         
         staff_number_list = w_next['Staff_number']
@@ -213,8 +214,6 @@ def hill_climbing(shifts, call_centre_scenario, max_wait, max_cost, max_agents, 
         
         good_periods_next = good_performance_periods(w_next_per_day, call_centre_scenario, max_wait)
         explored_fitness_value_history.append(good_periods_next)
-        
-        delta_good_periods = good_periods_best - good_periods_next
         
         if good_periods_next > good_periods_best:
             w_best = w_next.copy()
